@@ -66,6 +66,7 @@ The compiled JavaScript files will be in the `dist` directory.
 │   │   ├── entities
 │   │   ├── repositories
 │   ├── infrastructure
+|   │   ├── adapters
 |   │   ├── http
 |   │   │   ├── controllers/
 |   │   │   ├── routes/
@@ -75,9 +76,8 @@ The compiled JavaScript files will be in the `dist` directory.
 |   │   │   ├── postgres/
 │   ├── shared
 │   └── index.ts
-├── test
-├── templates
-├── dist
+│   └── swagger.ts
+├── tests
 ├── package.json
 ├── tsconfig.json
 └── README.md
@@ -89,6 +89,7 @@ The compiled JavaScript files will be in the `dist` directory.
   - `entities`: Domain entities.
   - `repositories`: Data access interfaces.
 - `src/infrastructure`: Application infrastructure.
+  - `adapters`: adapters request handling.
   - `http`: HTTP request handling.
     - `controllers`: Controllers to handle requests.
     - `routes`: Route definitions.
@@ -98,9 +99,8 @@ The compiled JavaScript files will be in the `dist` directory.
     - `postgres`: PostgreSQL specific implementations.
 - `src/shared`: Shared utilities and helpers.
 - `src/index.ts`: Application entry point.
-- `test`: Unit and integration tests.
-- `templates`: Folder for emails templates.
-- `dist`: Compiled files.
+- `src/swagger.ts`: documentation with swagger.
+- `tests`: Unit and integration tests.
 - `package.json`: npm configuration file.
 - `tsconfig.json`: TypeScript configuration.
 - `README.md`: Project documentation.
