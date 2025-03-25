@@ -13,7 +13,7 @@ Microservice for authentication based on hexagonal architecture built with Node.
 
 1. Clone the repository:
     ```sh
-    git clone https://github.com/luismab95/worksapce-ms-authentication.git
+    git clone https://github.com/luismab95/workspace-ms-authentication.git
     cd your-project
     ```
 

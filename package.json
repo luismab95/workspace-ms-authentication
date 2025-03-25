@@ -1,13 +1,13 @@
 {
   "name": "ms-authentication",
   "version": "1.0.0",
-  "description": "Microservice for authentication based on hexagonal architecture in worksapce project.",
+  "description": "Microservice for authentication based on hexagonal architecture in workspace project.",
   "main": "index.js",
   "license": "MIT",
   "author": "luismab95@gmail.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/luismab95/worksapce-ms-authentication.git"
+    "url": "https://github.com/luismab95/workspace-ms-authentication.git"
   },
   "keywords": [
     "typescript",
