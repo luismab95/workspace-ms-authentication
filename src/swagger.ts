@@ -6,10 +6,11 @@ const options = {
     info: {
       title: "MS-AUTHENTICATION",
       version: "1.0.0",
-      description: "Microservice for authentication based on hexagonal architecture",
-    }
+      description:
+        "Microservice for authentication based on hexagonal architecture in workspace project.",
+    },
   },
-  apis: ["src/infrastructure/adapters/routes/*.ts"],
+  apis: ["src/infrastructure/http/routes/*.ts"],
 };
 
 const swaggerSpec = swaggerJsdoc(options);
