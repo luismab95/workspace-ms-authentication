@@ -1,6 +1,8 @@
 import jwt from "jsonwebtoken";
 import { config } from "../infrastructure/environment";
 import { TokenI } from "src/domain/entities/auth";
+import { ErrorResponse } from "./response.helper";
+import { CodeHttpEnum } from "../enums/http-code.enum";
 
 const { jwtSecretKey, expiresIn } = config.server;
 
@@ -12,10 +14,10 @@ export function generateRefreshToken(payload: TokenI): string {
   return jwt.sign(payload, jwtSecretKey!, { expiresIn: "30d" });
 }
 
-export function verificarToken(token: string) {
+export function verifyToken(token: string) {
   try {
-    return jwt.verify(token, jwtSecretKey!);
+    return jwt.verify(token, jwtSecretKey!) as TokenI;
   } catch (error: any) {
-    throw new Error(error);
+    throw new ErrorResponse(error, CodeHttpEnum.unAuthorized);
   }
 }

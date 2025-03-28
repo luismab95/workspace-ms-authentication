@@ -1,6 +1,6 @@
 import { Response, Request, NextFunction } from "express";
 import { FIND_RECORD_FAILED, ERR_401 } from "src/shared/constants/messages";
-import { verificarToken, generateToken } from "src/shared/helpers/jwt.helper";
+import { verifyToken, generateToken } from "src/shared/helpers/jwt.helper";
 import { AuthRepositoryImpl } from "../../persistence/postgres/auth.repository";
 import { ErrorResponse } from "src/shared/helpers/response.helper";
 import { TokenI } from "src/domain/entities/auth";
@@ -22,7 +22,7 @@ export const RenewTokenAccessMiddleware = async (
       return next(
         faliedToken(FIND_RECORD_FAILED("de la sesión"), CodeHttpEnum.badRequest)
       );
-    const refreshTokenPayload = verificarToken(findSession.token) as TokenI;
+    const refreshTokenPayload = verifyToken(findSession.token) as TokenI;
 
     delete refreshTokenPayload.iat;
     delete refreshTokenPayload.exp;
@@ -47,7 +47,7 @@ export const VerifyTokenAccessMiddleware = async (
     }
     const token = authorizationHeader?.split(" ")[1];
     try {
-      verificarToken(token!) as TokenI;
+      verifyToken(token!) as TokenI;
       return next();
     } catch (err) {
       return next(faliedToken(ERR_401, CodeHttpEnum.unAuthorized));
