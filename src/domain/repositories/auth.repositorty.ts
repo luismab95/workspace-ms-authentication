@@ -1,28 +1,24 @@
 import {
-  AttemptsInterface,
-  SessionInterface,
-  OtpUserInterface,
+  OtpUserI,
   OtpUserType,
-  UserInterface,
-  LoginTypeInterface,
+  SessionI,
+  UserI,
+  UserType,
 } from "../entities/auth";
 
 export interface AuthRepository {
-  createAttempt(attempt: AttemptsInterface): Promise<AttemptsInterface>;
-  updatedStatusAttempt(userId: number, status: boolean): Promise<void>;
-  getLastAttempt(userId: number): Promise<AttemptsInterface | undefined>;
-  saveSession(session: SessionInterface): Promise<SessionInterface>;
-  createOtp(otp: OtpUserInterface): Promise<OtpUserInterface>;
+  saveSession(session: SessionI): Promise<SessionI>;
+  createUser(user: UserI): Promise<UserI>;
+  createOtp(otp: OtpUserI): Promise<OtpUserI>;
   updatedOtpUser(otp: string, userId: number, type: OtpUserType): Promise<void>;
-  updateValidateAndTermsUser(userId: number): Promise<void>;
   findOtp(
     otp: string,
     userId: number,
     type: OtpUserType
-  ): Promise<OtpUserInterface | undefined>;
-  findUserForLogin(username: string): Promise<UserInterface | undefined>;
-  findUserTypeLogin(
-    loginTypeId: number
-  ): Promise<LoginTypeInterface | undefined>;
-  toggleBloquedUser(userId: number, status: boolean): Promise<void>;
+  ): Promise<OtpUserI | undefined>;
+  findUserForLogin(email: string, type: UserType): Promise<UserI | undefined>;
+  findUser(email: string): Promise<UserI | undefined>;
+  updatePassword(userId: number, password: string): Promise<void>;
+  findSession(sessionId: number): Promise<SessionI | undefined>;
+  updateSession(sessionId: number): Promise<void>;
 }

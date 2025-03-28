@@ -3,9 +3,15 @@ import {
   loginOtpValidation,
   loginValidation,
   resendOtpValidation,
+  resetPasswordValidation,
+  signOutValidation,
+  signUpValidation,
 } from "../validations/auth.validation";
 import { AuthController } from "../controllers/auth.controller";
-import { RenewTokenAccessMiddleware } from "../middlewares/jwt.middleware";
+import {
+  RenewTokenAccessMiddleware,
+  VerifyTokenAccessMiddleware,
+} from "../middlewares/jwt.middleware";
 import { responseHelper } from "src/shared/helpers/response.helper";
 import { ValidationMiddleware } from "../middlewares/express-validator.middleware";
 import express, { Request, Response } from "express";
@@ -26,19 +32,6 @@ const router = express.Router();
  *     summary: Login de usuario
  *     tags:
  *       - Auth
- *     parameters:
- *       - in: header
- *         name: X-Client-IP
- *         description: Dirección IP del cliente.
- *         required: true
- *         schema:
- *           type: string
- *       - in: header
- *         name: X-Device-Info
- *         description: Agente de usuario del cliente.
- *         required: true
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -46,50 +39,34 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nombre del usuario
+ *                 description: Email del usuario
+ *                 required: true
  *               password:
  *                 type: string
  *                 description: Contraseña del usuario
- *               tokenId:
- *                 type: string
- *                 description: Token para autentificación con terceros
- *               entityId:
- *                 type: number
- *                 description: Id de la entidad para autentificación con terceros
  *                 required: true
  *     responses:
  *       200:
- *         description: Token de autentificación
+ *         description: Token de autentificación o mensaje de exito
  *       400:
  *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
  */
-router.post("/", [ValidationMiddleware(loginValidation)], controller.login);
+router.post("/", [ValidationMiddleware(loginValidation)], controller.signIn);
 
 /**
  * @swagger
  * tags:
  *   - name: Auth
  *     description: Operaciones relacionadas con autentificación
- * /ms-authentication/security/otp:
+ * /ms-authentication/security/register:
  *   post:
- *     summary: Segundo factor de autentificación de usuario
+ *     summary: Registro de usuario
  *     tags:
  *       - Auth
- *     parameters:
- *       - in: header
- *         name: X-Client-IP
- *         description: Dirección IP del cliente.
- *         required: true
- *         schema:
- *           type: string
- *       - in: header
- *         name: X-Device-Info
- *         description: Agente de usuario del cliente.
- *         required: true
- *         schema:
- *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -97,20 +74,83 @@ router.post("/", [ValidationMiddleware(loginValidation)], controller.login);
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nombre del usuario
+ *                 description: Correo electrónico del usuario
+ *                 required: true
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *                 required: true
+ *               firstname:
+ *                 type: string
+ *                 description: Nombres del usuario
+ *                 required: true
+ *               lastname:
+ *                 type: string
+ *                 description: Apellidos del usuario
+ *                 required: true
+ *               type:
+ *                 type: string
+ *                 description: Tipo de login
+ *                 required: true
+ *     responses:
+ *       200:
+ *         description: Mensaje de exito
+ *       400:
+ *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
+ */
+router.post(
+  "/register",
+  [ValidationMiddleware(signUpValidation)],
+  controller.signUp
+);
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Auth
+ *     description: Operaciones relacionadas con autentificación
+ * /ms-authentication/security/mfa:
+ *   post:
+ *     summary: Segundo factor de autentificación de usuario
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Correo electrónico del usuario
+ *                 required: true 
  *               otp:
  *                 type: string
  *                 description: Código de verificación del usuario
+ *                 required: true 
+ *               ipAddress:
+ *                 type: string
+ *                 description: Ip pública del cliente
+ *                 required: true
+ *               information:
+ *                 type: string
+ *                 description: Información del cliente
+ *                 required: true
  *     responses:
  *       200:
  *         description: Token de autentificación
  *       400:
  *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
  */
 router.post(
-  "/otp",
+  "/mfa",
   [ValidationMiddleware(loginOtpValidation)],
   controller.twoFactorAuth
 );
@@ -126,12 +166,6 @@ router.post(
  *     tags:
  *       - Auth
  *     parameters:
- *       - in: header
- *         name: x-refresh-token
- *         description: Token de refresco.
- *         required: true
- *         schema:
- *           type: string
  *       - in: path
  *         name: id
  *         description: ID de la sesión
@@ -159,7 +193,40 @@ router.post(
  * tags:
  *   - name: Auth
  *     description: Operaciones relacionadas con autentificación
- * /ms-authentication/security/forgot-password:
+ * /ms-authentication/security/session/{id}:
+ *   delete:
+ *     summary: Cerrar sessión
+ *     tags:
+ *       - Auth
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         description: ID de la sesión
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Mensaje de exito
+ *       400:
+ *         description: Mensaje de error
+ *       401:
+ *         description: Acceso no autorizado
+ *       422:
+ *         description: Mensaje de error de valdiación
+ */
+router.delete(
+  "/session/:id",
+  [ValidationMiddleware(signOutValidation), VerifyTokenAccessMiddleware],
+  controller.signOut
+);
+
+/**
+ * @swagger
+ * tags:
+ *   - name: Auth
+ *     description: Operaciones relacionadas con autentificación
+ * /ms-authentication/security/forget-password:
  *   post:
  *     summary: Olvido su contraseña
  *     tags:
@@ -171,17 +238,20 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nombre del usuario
+ *                 description: Correo electrónico del usuario
+ *                 required: true
  *     responses:
  *       200:
  *         description: Mensaje de verificación
  *       400:
  *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
  */
 router.post(
-  "/forgot-password",
+  "/forget-password",
   [ValidationMiddleware(forgotPasswordValidation)],
   controller.forgotPassword
 );
@@ -192,7 +262,7 @@ router.post(
  *   - name: Auth
  *     description: Operaciones relacionadas con autentificación
  * /ms-authentication/security/reset-password:
- *   post:
+ *   patch:
  *     summary: Resetear contraseña
  *     tags:
  *       - Auth
@@ -203,21 +273,29 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nombre del usuario
+ *                 description: Correo electrónico del usuario
+ *                 required: true
  *               otp:
  *                 type: string
  *                 description: Código de verificación del usuario
+ *                 required: true
+ *               password:
+ *                 type: string
+ *                 description: Nueva contraseña del usuario
+ *                 required: true
  *     responses:
  *       200:
  *         description: Mensaje de exito
  *       400:
  *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
  */
-router.post(
+router.patch(
   "/reset-password",
-  [ValidationMiddleware(loginOtpValidation)],
+  [ValidationMiddleware(resetPasswordValidation)],
   controller.resetPassword
 );
 
@@ -238,17 +316,21 @@ router.post(
  *           schema:
  *             type: object
  *             properties:
- *               username:
+ *               email:
  *                 type: string
- *                 description: Nombre del usuario
+ *                 description: Correo electrónico del usuario
+ *                 required: true
  *               type:
  *                 type: string
  *                 description: tipo de Código de verificación del usuario L, R
+ *                 required: true
  *     responses:
  *       200:
  *         description: Mensaje de exito
  *       400:
  *         description: Mensaje de error
+ *       422:
+ *         description: Mensaje de error de valdiación
  */
 router.post(
   "/resend-otp",

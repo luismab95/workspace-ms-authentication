@@ -8,4 +8,5 @@ export const enum CodeHttpEnum {
   internalServerError = 500,
   notImplement = 501,
   badGateway = 502,
+  validator = 422,
 }

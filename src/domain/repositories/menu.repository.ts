@@ -1,5 +1,5 @@
-import { MenuInterface } from "../entities/menu";
+import { MenuI } from "../entities/menu";
 
 export interface MenuRepository {
-  get(): Promise<MenuInterface[]>;
+  get(): Promise<MenuI[]>;
 }

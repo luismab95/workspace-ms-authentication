@@ -3,18 +3,18 @@ import { Request, Response, NextFunction } from "express";
 import { responseHelper } from "src/shared/helpers/response.helper";
 import { ServiceContainer } from "src/shared/infrastructure/services-container";
 import {
-  LoginInterface,
-  LoginOtpInterface,
-  ResendOtpInterface,
+  LoginI,
+  LoginOtpI,
+  ResendOtpI,
+  ResetPasswordI,
+  UserI,
 } from "src/domain/entities/auth";
 
 export class AuthController {
-  async login(req: Request, res: Response, next: NextFunction): Promise<void> {
+  async signIn(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const user: LoginInterface = req.body;
-      user.ipAddress = req.headers["x-client-ip"] as string;
-      user.detail = req.headers["x-device-info"] as string;
-      const data = await ServiceContainer.auth.login(user);
+      const user: LoginI = req.body;
+      const data = await ServiceContainer.auth.signIn(user);
       responseHelper(req, res, data);
     } catch (error) {
       next(error);
@@ -27,10 +27,18 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userOtp: LoginOtpInterface = req.body;
-      userOtp.ipAddress = req.headers["x-client-ip"] as string;
-      userOtp.detail = req.headers["x-device-info"] as string;
-      const data = await ServiceContainer.auth.validOtp(userOtp);
+      const userOtp: LoginOtpI = req.body;
+      const data = await ServiceContainer.auth.singInOtp(userOtp);
+      responseHelper(req, res, data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async signUp(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const user: UserI = req.body;
+      const data = await ServiceContainer.auth.signUp(user);
       responseHelper(req, res, data);
     } catch (error) {
       next(error);
@@ -43,7 +51,7 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userOtp: ResendOtpInterface = req.body as ResendOtpInterface;
+      const userOtp: ResendOtpI = req.body as ResendOtpI;
       const data = await ServiceContainer.auth.resendOtp(userOtp);
       responseHelper(req, res, data);
     } catch (error) {
@@ -57,8 +65,8 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const username: string = req.body.username;
-      const data = await ServiceContainer.auth.forgotPassword(username);
+      const email: string = req.body.email;
+      const data = await ServiceContainer.auth.forgetPassword(email);
       responseHelper(req, res, data);
     } catch (error) {
       next(error);
@@ -71,8 +79,22 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const userOtp: LoginOtpInterface = req.body;
-      const data = await ServiceContainer.auth.resetPassword(userOtp);
+      const resetPassword: ResetPasswordI = req.body;
+      const data = await ServiceContainer.auth.resetPassword(resetPassword);
+      responseHelper(req, res, data);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  async signOut(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const sessionId: number = Number(req.params.sessionId);
+      const data = await ServiceContainer.auth.signOut(sessionId);
       responseHelper(req, res, data);
     } catch (error) {
       next(error);

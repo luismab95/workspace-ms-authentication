@@ -10,3 +10,4 @@ export const FIND_RECORD_FAILED = (option: string) =>
   `No se pudo encontrar datos del ${option}.`;
 export const DATABASE_ERR = `Error al guardar la información.`;
 export const DATABASE_ERR_QUERY = `Error al consultar la información.`;
+export const USER_EXISTS = `El usuario ya se encuentra registrado.`;

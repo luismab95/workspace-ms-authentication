@@ -1,58 +1,84 @@
-import { body } from "express-validator";
+import { body, param } from "express-validator";
 
-const usernameBodyValidation = body("username")
-  .isString()
-  .withMessage("Usuario debe ser un texto")
+const emailBodyValidation = body("email")
+  .isEmail()
+  .withMessage("Correo electrónico no válido")
   .notEmpty({ ignore_whitespace: true })
-  .withMessage("Usuario es requerido")
-  .isLength({ max: 100 })
-  .withMessage("Usuario debe tener un máximo de 100 caracteres");
+  .withMessage("Usuario es requerido");
+
+const typeBodyValidation = body("type")
+  .isString()
+  .withMessage("Tipo debe ser un texto")
+  .notEmpty({ ignore_whitespace: true })
+  .withMessage("Tipo es requerido")
+  .isLength({ min: 1, max: 1 })
+  .withMessage("Tipo debe tener 1 caracter");
+
+const passwordBodyValidation = body("password")
+  .isString()
+  .withMessage("Contraseña debe ser un texto")
+  .notEmpty({ ignore_whitespace: true })
+  .withMessage("Contraseña es requerido");
+
+const otpBodyValidation = body("otp")
+  .isString()
+  .withMessage("Código de verificación debe ser un texto")
+  .notEmpty({ ignore_whitespace: true })
+  .withMessage("Código de verificación es requerido")
+  .isLength({ min: 8, max: 8 })
+  .withMessage("Código de verificación debe tener 8 caracteres");
 
 export const loginValidation = [
-  usernameBodyValidation,
-  body("password")
-    .isString()
-    .withMessage("Contraseña debe ser un texto")
-    .optional({ nullable: true })
-    .isLength({ min: 8 })
-    .withMessage("Contraseña debe tener al menos 8 caracteres")
-    .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/
-    )
-    .withMessage(
-      "Contraseña debe tener al menos una mayúscula, una minúscula, un número y un carácter especial"
-    ),
-  body("tokenId")
-    .isString()
-    .withMessage("Token debe ser un texto")
-    .optional({ nullable: true }),
-  body("entityId")
-    .isInt()
-    .withMessage("Entidad debe ser un número")
-    .notEmpty()
-    .withMessage("Entidad es requerido"),
+  emailBodyValidation,
+  passwordBodyValidation,
+  typeBodyValidation,
 ];
 
 export const loginOtpValidation = [
-  usernameBodyValidation,
-  body("otp")
+  emailBodyValidation,
+  otpBodyValidation,
+  body("ipAddress")
     .isString()
-    .withMessage("Código de verificación debe ser un texto")
+    .withMessage("Ip pública debe ser un texto")
     .notEmpty({ ignore_whitespace: true })
-    .withMessage("Código de verificación es requerido")
-    .isLength({ min: 8, max: 8 })
-    .withMessage("Código de verificación debe tener 8 caracteres"),
+    .withMessage("Ip pública es requerido"),
+  body("information")
+    .isString()
+    .withMessage("Información del cliente debe ser un texto")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("Información del cliente es requerido"),
 ];
 
-export const resendOtpValidation = [
-  usernameBodyValidation,
-  body("type")
-    .isString()
-    .withMessage("Tipo debe ser un texto")
-    .notEmpty({ ignore_whitespace: true })
-    .withMessage("Tipo es requerido")
-    .isLength({ min: 1, max: 1 })
-    .withMessage("Tipo debe tener 1 caracter"),
+export const resetPasswordValidation = [
+  emailBodyValidation,
+  otpBodyValidation,
+  passwordBodyValidation,
 ];
 
-export const forgotPasswordValidation = [usernameBodyValidation];
+export const resendOtpValidation = [emailBodyValidation, typeBodyValidation];
+
+export const forgotPasswordValidation = [emailBodyValidation];
+
+export const signOutValidation = [
+  param("id").isNumeric().withMessage("Id debe ser un número"),
+];
+
+export const signUpValidation = [
+  emailBodyValidation,
+  typeBodyValidation,
+  passwordBodyValidation,
+  body("firstname")
+    .isString()
+    .withMessage("Nombres debe ser un texto")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("Nombres es requerido")
+    .isLength({ max: 100 })
+    .withMessage("Nombres solo permite un máximo de 100 caracteres"),
+  body("lastname")
+    .isString()
+    .withMessage("Apellidos debe ser un texto")
+    .notEmpty({ ignore_whitespace: true })
+    .withMessage("Apellidos es requerido")
+    .isLength({ max: 100 })
+    .withMessage("Apellidos solo permite un máximo de 100 caracteres"),
+];

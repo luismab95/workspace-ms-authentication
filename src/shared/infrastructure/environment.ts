@@ -17,9 +17,6 @@ export const config = {
     msEmail: process.env.MS_EMAIL,
     mailAuthUsername: process.env.MAIL_AUTH_USERNAME,
     mailAuthPassword: process.env.MAIL_AUTH_PASSWORD,
-    msLogs: process.env.MS_LOGS,
-    logsAuthUsername: process.env.LOGS_AUTH_USERNAME,
-    logsAuthPassword: process.env.LOGS_AUTH_PASSWORD,
-    entityCode: process.env.ENTITY_CODE,
+    googleClientId: process.env.GOOGLE_CLIENT_ID,
   },
 };

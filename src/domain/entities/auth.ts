@@ -1,57 +1,46 @@
-export interface LoginInterface {
-  username: string;
-  password?: string;
-  tokenId?: string;
-  ipAddress?: string;
-  detail?: string;
-  entityId?: number;
+export interface LoginI {
+  type: UserType;
+  email: string;
+  password: string;
+  ipAddress: string;
+  information: string;
 }
 
-export interface LoginResponseInterface {
+export interface LoginResponseI {
   token: string;
   refreshToken: string;
-  validate: boolean;
 }
 
-export interface ResendOtpInterface {
-  username: string;
+export interface ResendOtpI {
+  email: string;
   type: OtpUserType;
 }
 
-export interface TokenInterface {
+export type OtpUserType = "L" | "R";
+export type UserType = "L" | "G";
+
+export interface TokenI {
   id: number;
   sessionId?: number;
-  code: string;
   email: string;
-  username: string;
   firstname: string;
   lastname: string;
-  photo?: string;
   iat?: number;
   exp?: number;
 }
 
-export interface AttemptsInterface {
+export interface SessionI {
   id?: number;
-  userId?: number;
-  status?: boolean;
-  attempt?: number;
-  createdAt?: string | Date;
-}
-
-export interface SessionInterface {
-  id?: number;
-  ipAddress: string;
   token: string;
+  ipAddress: string;
+  information: string;
   createdAt?: string | Date;
   updatedAt?: string | Date;
-  detail: string;
   userId: number;
   active?: boolean;
 }
-export type OtpUserType = "L" | "R";
 
-export interface OtpUserInterface {
+export interface OtpUserI {
   id?: number;
   otp: string;
   type: OtpUserType | string;
@@ -61,54 +50,25 @@ export interface OtpUserInterface {
   updatedAt?: string | Date;
 }
 
-export interface LoginOtpInterface {
-  username: string;
+export interface LoginOtpI {
+  email: string;
   otp: string;
   ipAddress?: string;
-  detail?: string;
+  information?: string;
 }
 
-export interface UserInterface {
-  id?: number;
-  code?: string;
+export interface ResetPasswordI {
   email: string;
-  username: string;
+  password: string;
+  otp: string;
+}
+
+export interface UserI {
+  id?: number;
+  email: string;
   password?: string;
   firstname: string;
   lastname: string;
-  twoFactorAuth?: boolean;
-  validate?: boolean;
-  entityId: number;
-  userTypeId: number;
-  auth: AuthBrokerInterface;
-  photo: string;
-  entityName: string;
-  entitycode: string;
-  loginTypeId: number;
-}
-
-export interface LoginTypeInterface {
-  id: number;
-  alias: string;
-}
-
-export interface AuthBrokerInterface {
-  google?: GoogleInterface;
-  local?: LocalInterface;
-  ad?: AdInterface;
-}
-
-export interface LocalInterface {}
-
-export interface AdInterface {
-  host: string;
-  port: number;
-  domain: string;
-  username: string;
-  password: string;
-  secure: boolean;
-}
-
-export interface GoogleInterface {
-  domain: string;
+  type: UserType | string;
+  status?: boolean;
 }

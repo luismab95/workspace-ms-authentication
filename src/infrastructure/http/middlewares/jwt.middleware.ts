@@ -3,10 +3,11 @@ import { FIND_RECORD_FAILED, ERR_401 } from "src/shared/constants/messages";
 import { verificarToken, generateToken } from "src/shared/helpers/jwt.helper";
 import { AuthRepositoryImpl } from "../../persistence/postgres/auth.repository";
 import { ErrorResponse } from "src/shared/helpers/response.helper";
-import { TokenInterface } from "src/domain/entities/auth";
+import { TokenI } from "src/domain/entities/auth";
+import { CodeHttpEnum } from "src/shared/enums/http-code.enum";
 
 export interface CustomRequestInterface extends Request {
-  session?: TokenInterface;
+  session?: TokenI;
 }
 
 export const RenewTokenAccessMiddleware = async (
@@ -15,27 +16,44 @@ export const RenewTokenAccessMiddleware = async (
   next: NextFunction
 ) => {
   const authRepository = new AuthRepositoryImpl();
-  const refreshToken = req.headers["x-refresh-token"] as string;
   try {
-    const refreshTokenPayload = verificarToken(refreshToken) as TokenInterface;
-    const userSessions = await authRepository.findSession(
-      refreshTokenPayload.id,
-      true
-    );
-    const sessionLogout = userSessions.find(
-      (userSession) => userSession.id === Number(req.params.id)
-    );
-    if (sessionLogout === undefined)
-      return next(faliedToken(FIND_RECORD_FAILED("de la sesión"), 400));
+    const findSession = await authRepository.findSession(Number(req.params.id));
+    if (findSession)
+      return next(
+        faliedToken(FIND_RECORD_FAILED("de la sesión"), CodeHttpEnum.badRequest)
+      );
+    const refreshTokenPayload = verificarToken(findSession.token) as TokenI;
 
     delete refreshTokenPayload.iat;
     delete refreshTokenPayload.exp;
     refreshTokenPayload.sessionId = Number(req.params.id);
     const newTokenAccess = generateToken(refreshTokenPayload);
     req.headers["x-access-token"] = newTokenAccess;
-    next();
+    return next();
   } catch (error) {
-    return next(faliedToken(ERR_401, 401));
+    return next(faliedToken(ERR_401, CodeHttpEnum.unAuthorized));
+  }
+};
+
+export const VerifyTokenAccessMiddleware = async (
+  req: CustomRequestInterface,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    const authorizationHeader = req.headers.authorization;
+    if (authorizationHeader?.startsWith("Bearer ")) {
+      return next(faliedToken(ERR_401, CodeHttpEnum.unAuthorized));
+    }
+    const token = authorizationHeader?.split(" ")[1];
+    try {
+      verificarToken(token!) as TokenI;
+      return next();
+    } catch (err) {
+      return next(faliedToken(ERR_401, CodeHttpEnum.unAuthorized));
+    }
+  } catch (error) {
+    return next(faliedToken(ERR_401, CodeHttpEnum.unAuthorized));
   }
 };
 

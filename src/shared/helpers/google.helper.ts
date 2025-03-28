@@ -4,8 +4,7 @@ export class GoogleHelper {
   public verify = async (
     idToken: string,
     username: string,
-    googleClientId: string,
-    googleDomain: string
+    googleClientId: string
   ) => {
     const client = new OAuth2Client();
 
@@ -15,12 +14,7 @@ export class GoogleHelper {
         audience: googleClientId,
       });
       const payload = ticket.getPayload();
-      if (
-        payload === undefined ||
-        payload.email !== username ||
-        payload.hd !== googleDomain
-      )
-        return null;
+      if (payload === undefined || payload.email !== username) return null;
       return payload;
     } catch (error) {
       return null;

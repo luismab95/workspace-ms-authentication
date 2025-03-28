@@ -1,9 +1,4 @@
-import { Request, Response } from "express";
-
-export interface ServiceResponseInterface {
-  req: Request;
-  res: Response;
-  data?: any;
+export interface ServiceResponseI<T> {
+  data: T;
   message?: string;
-  statusCode?: number;
 }

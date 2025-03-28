@@ -1,19 +1,14 @@
 import jwt from "jsonwebtoken";
 import { config } from "../infrastructure/environment";
-import { TokenInterface } from "src/domain/entities/auth";
+import { TokenI } from "src/domain/entities/auth";
 
 const { jwtSecretKey, expiresIn } = config.server;
 
-export function generateToken(payload: TokenInterface): string {
+export function generateToken(payload: TokenI): string {
   return jwt.sign(payload, jwtSecretKey!, { expiresIn });
 }
 
-export function generateTokenResetPassword(payload: TokenInterface): string {
-  return jwt.sign(payload, jwtSecretKey!, { expiresIn: '15m' });
-}
-
-
-export function generateRefreshToken(payload: TokenInterface): string {
+export function generateRefreshToken(payload: TokenI): string {
   return jwt.sign(payload, jwtSecretKey!, { expiresIn: "30d" });
 }
 

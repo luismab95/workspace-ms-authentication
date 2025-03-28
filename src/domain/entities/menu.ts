@@ -1,4 +1,4 @@
-export interface MenuInterface {
+export interface MenuI {
   remoteEntry: string;
   name: string;
   path: string;
@@ -7,6 +7,6 @@ export interface MenuInterface {
   moduleName: string;
 }
 
-export interface ManifestInterface {
-  [key: string]: MenuInterface;
+export interface ManifestI {
+  [key: string]: MenuI;
 }

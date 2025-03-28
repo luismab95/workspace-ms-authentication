@@ -14,7 +14,7 @@ const startServer = async () => {
     const { port, host, nodeEnv } = config.server;
     const routePrefix = "ms-authentication";
     const corsOptions = {
-      origin: "",
+      origin: "*",
     };
 
     const app = express();
