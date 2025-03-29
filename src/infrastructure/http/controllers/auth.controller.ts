@@ -1,4 +1,3 @@
-import { CodeHttpEnum } from "src/shared/enums/http-code.enum";
 import { Request, Response, NextFunction } from "express";
 import { responseHelper } from "src/shared/helpers/response.helper";
 import { ServiceContainer } from "src/shared/infrastructure/services-container";
@@ -93,22 +92,9 @@ export class AuthController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const sessionId: number = Number(req.params.sessionId);
+      const sessionId: number = Number(req.params.id);
       const data = await ServiceContainer.auth.signOut(sessionId);
       responseHelper(req, res, data);
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async getManifest(
-    _req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
-    try {
-      const data = await ServiceContainer.auth.getManifest();
-      res.status(CodeHttpEnum.ok).json(data);
     } catch (error) {
       next(error);
     }

@@ -8,13 +8,9 @@ import {
   signUpValidation,
 } from "../validations/auth.validation";
 import { AuthController } from "../controllers/auth.controller";
-import {
-  RenewTokenAccessMiddleware,
-  VerifyTokenAccessMiddleware,
-} from "../middlewares/jwt.middleware";
-import { responseHelper } from "src/shared/helpers/response.helper";
+import { VerifyTokenAccessMiddleware } from "../middlewares/jwt.middleware";
 import { ValidationMiddleware } from "../middlewares/express-validator.middleware";
-import express, { Request, Response } from "express";
+import express from "express";
 
 //DEPENDENCIES
 const controller = new AuthController();
@@ -128,11 +124,11 @@ router.post(
  *               email:
  *                 type: string
  *                 description: Correo electrónico del usuario
- *                 required: true 
+ *                 required: true
  *               otp:
  *                 type: string
  *                 description: Código de verificación del usuario
- *                 required: true 
+ *                 required: true
  *               ipAddress:
  *                 type: string
  *                 description: Ip pública del cliente
@@ -153,39 +149,6 @@ router.post(
   "/mfa",
   [ValidationMiddleware(loginOtpValidation)],
   controller.twoFactorAuth
-);
-
-/**
- * @swagger
- * tags:
- *   - name: Auth
- *     description: Operaciones relacionadas con autentificación
- * /ms-authentication/security/refresh-token/{id}:
- *   post:
- *     summary: Refrescar token de acceso
- *     tags:
- *       - Auth
- *     parameters:
- *       - in: path
- *         name: id
- *         description: ID de la sesión
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Token de autentificación
- *       400:
- *         description: Mensaje de error
- *       401:
- *         description: Acceso no autorizado
- */
-router.post(
-  "/refresh-token/:id",
-  RenewTokenAccessMiddleware,
-  (req: Request, res: Response) => {
-    responseHelper(req, res, req.headers["x-access-token"] as string);
-  }
 );
 
 /**
@@ -337,23 +300,5 @@ router.post(
   [ValidationMiddleware(resendOtpValidation)],
   controller.resendOtp
 );
-
-/**
- * @swagger
- * tags:
- *   - name: Auth
- *     description: Operaciones relacionadas con autentificación
- * /ms-authentication/security/manifest:
- *   get:
- *     summary: Información de microfronts
- *     tags:
- *       - Auth
- *     responses:
- *       200:
- *         description: manifiesto en JSON
- *       400:
- *         description: Mensaje de error
- */
-router.get("/manifest", controller.getManifest);
 
 export default router;

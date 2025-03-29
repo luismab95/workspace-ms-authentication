@@ -23,19 +23,14 @@ import { CryptoHelper } from "src/shared/helpers/crypto.helper";
 import { GoogleHelper } from "src/shared/helpers/google.helper";
 import { LoginTypeEnum } from "src/shared/enums/login.enum";
 import { maskString } from "src/shared/helpers/string.helper";
-import { MenuRepository } from "src/domain/repositories/menu.repository";
 import { OtpTypeEnum } from "src/shared/enums/opt.enum";
 import { randomCharacters } from "src/shared/helpers/random.helper";
 import { sendMail } from "src/shared/helpers/email.helper";
-import { ManifestI } from "src/domain/entities/menu";
 import { ErrorResponse } from "src/shared/helpers/response.helper";
 import { CodeHttpEnum } from "src/shared/enums/http-code.enum";
 
 export class AuthService {
-  constructor(
-    private readonly authRepository: AuthRepository,
-    private readonly menuRepository: MenuRepository
-  ) {}
+  constructor(private readonly authRepository: AuthRepository) {}
 
   async signUp(user: UserI): Promise<string> {
     const findUser = await this.authRepository.findUser(user.email);
@@ -310,15 +305,6 @@ export class AuthService {
     );
 
     return "Se ha reestablecido su contraseña correctamente";
-  }
-
-  async getManifest(): Promise<ManifestI> {
-    const manifest = {} as ManifestI;
-    const menus = await this.menuRepository.get();
-    menus.forEach((menu) => {
-      manifest[randomCharacters("LETTER", 8)] = { ...menu };
-    });
-    return JSON.parse(JSON.stringify(manifest));
   }
 
   async sendOptEmail(
